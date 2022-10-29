@@ -25,7 +25,8 @@
             #pragma multi_compile __ TF2D_ON
             #pragma multi_compile __ CROSS_SECTION_ON
             #pragma multi_compile __ LIGHTING_ON
-            #pragma multi_compile DEPTHWRITE_ON DEPTHWRITE_OFF
+            //remove for vr
+            //#pragma multi_compile DEPTHWRITE_ON DEPTHWRITE_OFF
             #pragma multi_compile __ DVR_BACKWARD_ON
             #pragma multi_compile __ RAY_TERMINATE_ON
             #pragma multi_compile __ USE_MAIN_LIGHT
@@ -280,7 +281,8 @@
             // Direct Volume Rendering
             frag_out frag_dvr(frag_in i)
             {
-                #define MAX_NUM_STEPS 512
+                //#define MAX_NUM_STEPS 512
+                #define MAX_NUM_STEPS 64
                 #define OPACITY_THRESHOLD (1.0 - 1.0 / 255.0)
 
 #ifdef DVR_BACKWARD_ON
