@@ -1,6 +1,12 @@
+using Facebook.WitAi.Lib;
 using UnityEngine;
 
-
+public enum VolumeRenderMode
+{
+    DirectVolumeRendering,
+    MaximumIntensityProjectipon,
+    IsosurfaceRendering
+}
 
 [ExecuteInEditMode]
 public class VolumeRenderedObject : MonoBehaviour
@@ -17,14 +23,14 @@ public class VolumeRenderedObject : MonoBehaviour
     [SerializeField, HideInInspector]
     public MeshRenderer meshRenderer;
 
-//    [SerializeField, HideInInspector]
-//    private RenderMode renderMode;
-//    [SerializeField, HideInInspector]
-//    private TFRenderMode tfRenderMode;
-//    [SerializeField, HideInInspector]
-//   private bool lightingEnabled;
-//    [SerializeField, HideInInspector]
-//    private LightSource lightSource;
+    [SerializeField, HideInInspector]
+    private VolumeRenderMode renderMode;
+    //    [SerializeField, HideInInspector]
+    //    private TFRenderMode tfRenderMode;
+    //    [SerializeField, HideInInspector]
+    //   private bool lightingEnabled;
+    //    [SerializeField, HideInInspector]
+    //    private LightSource lightSource;
 
     [SerializeField, HideInInspector]
     private Vector2 visibilityWindow = new Vector2(0.0f, 1.0f);
@@ -34,6 +40,9 @@ public class VolumeRenderedObject : MonoBehaviour
     private bool dvrBackward = false;
     [SerializeField, HideInInspector]
     private bool cubicInterpolationEnabled = false;
+
+    public int maxStepForDVR = 512;
+    public int maxStepForISOSurf = 512;
 
     //private CrossSectionManager crossSectionManager;
 
@@ -55,15 +64,15 @@ public class VolumeRenderedObject : MonoBehaviour
     //    return sliceRenderingPlane.GetComponent<SlicingPlane>();
     //}
 
-    //public void SetRenderMode(RenderMode mode)
-    //{
-    //    if (renderMode != mode)
-    //    {
-    //        renderMode = mode;
-    //        SetVisibilityWindow(0.0f, 1.0f); // reset visibility window
-    //    }
-    //    UpdateMaterialProperties();
-    //}
+    public void SetRenderMode(VolumeRenderMode mode)
+    {
+        if (renderMode != mode)
+        {
+            renderMode = mode;
+            SetVisibilityWindow(0.0f, 1.0f); // reset visibility window
+        }
+        UpdateMaterialProperties();
+    }
 
     //public void SetTransferFunctionMode(TFRenderMode mode)
     //{
@@ -119,19 +128,37 @@ public class VolumeRenderedObject : MonoBehaviour
     //    UpdateMaterialProperties();
     //}
 
-    //public void SetVisibilityWindow(float min, float max)
-    //{
-    //    SetVisibilityWindow(new Vector2(min, max));
-    //}
+    public void SetVisibilityWindow(float min, float max)
+    {
+        SetVisibilityWindow(new Vector2(min, max));
+    }
 
-    //public void SetVisibilityWindow(Vector2 window)
-    //{
-    //    if (window != visibilityWindow)
-    //    {
-    //        visibilityWindow = window;
-    //        UpdateMaterialProperties();
-    //    }
-    //}
+    public void SetVisibilityWindowMin(float min)
+    {
+        if(visibilityWindow.x != min)
+        {
+            visibilityWindow.x = min;
+            UpdateMaterialProperties();
+        }
+    }
+
+    public void SetVisibilityWindowMax(float max)
+    {
+        if (visibilityWindow.y != max)
+        {
+            visibilityWindow.y = max;
+            UpdateMaterialProperties();
+        }
+    }
+
+    public void SetVisibilityWindow(Vector2 window)
+    {
+        if (window != visibilityWindow)
+        {
+            visibilityWindow = window;
+            UpdateMaterialProperties();
+        }
+    }
 
     //public Vector2 GetVisibilityWindow()
     //{
@@ -186,80 +213,83 @@ public class VolumeRenderedObject : MonoBehaviour
     //    UpdateMaterialProperties();
     //}
 
-    //private void UpdateMaterialProperties()
-    //{
-    //    bool useGradientTexture = tfRenderMode == TFRenderMode.TF2D || renderMode == RenderMode.IsosurfaceRendering || lightingEnabled;
-    //    meshRenderer.sharedMaterial.SetTexture("_GradientTex", useGradientTexture ? dataset.GetGradientTexture() : null);
+    private void UpdateMaterialProperties()
+    {
+        bool useGradientTexture =/* tfRenderMode == TFRenderMode.TF2D || */renderMode == VolumeRenderMode.IsosurfaceRendering/* || lightingEnabled*/;
+        meshRenderer.sharedMaterial.SetTexture("_GradientTex", useGradientTexture ? dataset.GetGradientTexture() : null);
 
-    //    if (tfRenderMode == TFRenderMode.TF2D)
-    //    {
-    //        meshRenderer.sharedMaterial.SetTexture("_TFTex", transferFunction2D.GetTexture());
-    //        meshRenderer.sharedMaterial.EnableKeyword("TF2D_ON");
-    //    }
-    //    else
-    //    {
-    //        meshRenderer.sharedMaterial.SetTexture("_TFTex", transferFunction.GetTexture());
-    //        meshRenderer.sharedMaterial.DisableKeyword("TF2D_ON");
-    //    }
+        //if (tfRenderMode == TFRenderMode.TF2D)
+        //{
+        //    meshRenderer.sharedMaterial.SetTexture("_TFTex", transferFunction2D.GetTexture());
+        //    meshRenderer.sharedMaterial.EnableKeyword("TF2D_ON");
+        //}
+        //else
+        //{
+        //    meshRenderer.sharedMaterial.SetTexture("_TFTex", transferFunction.GetTexture());
+        //    meshRenderer.sharedMaterial.DisableKeyword("TF2D_ON");
+        //}
 
-    //    if (lightingEnabled)
-    //        meshRenderer.sharedMaterial.EnableKeyword("LIGHTING_ON");
-    //    else
-    //        meshRenderer.sharedMaterial.DisableKeyword("LIGHTING_ON");
+        //if (lightingEnabled)
+        //    meshRenderer.sharedMaterial.EnableKeyword("LIGHTING_ON");
+        //else
+        //    meshRenderer.sharedMaterial.DisableKeyword("LIGHTING_ON");
 
-    //    if (lightSource == LightSource.SceneMainLight)
-    //        meshRenderer.sharedMaterial.EnableKeyword("USE_MAIN_LIGHT");
-    //    else
-    //        meshRenderer.sharedMaterial.DisableKeyword("USE_MAIN_LIGHT");
+        //if (lightSource == LightSource.SceneMainLight)
+        //    meshRenderer.sharedMaterial.EnableKeyword("USE_MAIN_LIGHT");
+        //else
+        //    meshRenderer.sharedMaterial.DisableKeyword("USE_MAIN_LIGHT");
 
-    //    switch (renderMode)
-    //    {
-    //        case RenderMode.DirectVolumeRendering:
-    //            {
-    //                meshRenderer.sharedMaterial.EnableKeyword("MODE_DVR");
-    //                meshRenderer.sharedMaterial.DisableKeyword("MODE_MIP");
-    //                meshRenderer.sharedMaterial.DisableKeyword("MODE_SURF");
-    //                break;
-    //            }
-    //        case RenderMode.MaximumIntensityProjectipon:
-    //            {
-    //                meshRenderer.sharedMaterial.DisableKeyword("MODE_DVR");
-    //                meshRenderer.sharedMaterial.EnableKeyword("MODE_MIP");
-    //                meshRenderer.sharedMaterial.DisableKeyword("MODE_SURF");
-    //                break;
-    //            }
-    //        case RenderMode.IsosurfaceRendering:
-    //            {
-    //                meshRenderer.sharedMaterial.DisableKeyword("MODE_DVR");
-    //                meshRenderer.sharedMaterial.DisableKeyword("MODE_MIP");
-    //                meshRenderer.sharedMaterial.EnableKeyword("MODE_SURF");
-    //                break;
-    //            }
-    //    }
+        switch (renderMode)
+        {
+            case VolumeRenderMode.DirectVolumeRendering:
+                {
+                    meshRenderer.sharedMaterial.EnableKeyword("MODE_DVR");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_MIP");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_SURF");
+                    break;
+                }
+            case VolumeRenderMode.MaximumIntensityProjectipon:
+                {
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_DVR");
+                    meshRenderer.sharedMaterial.EnableKeyword("MODE_MIP");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_SURF");
+                    break;
+                }
+            case VolumeRenderMode.IsosurfaceRendering:
+                {
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_DVR");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_MIP");
+                    meshRenderer.sharedMaterial.EnableKeyword("MODE_SURF");
+                    break;
+                }
+        }
 
-    //    meshRenderer.sharedMaterial.SetFloat("_MinVal", visibilityWindow.x);
-    //    meshRenderer.sharedMaterial.SetFloat("_MaxVal", visibilityWindow.y);
-    //    meshRenderer.sharedMaterial.SetVector("_TextureSize", new Vector3(dataset.dimX, dataset.dimY, dataset.dimZ));
+        meshRenderer.sharedMaterial.SetInt("_NumMaxStepForDVR", maxStepForDVR);
+        meshRenderer.sharedMaterial.SetInt("_NumMaxStepForISOSurf", maxStepForISOSurf);
 
-    //    if (rayTerminationEnabled)
-    //        meshRenderer.sharedMaterial.EnableKeyword("RAY_TERMINATE_ON");
-    //    else
-    //        meshRenderer.sharedMaterial.DisableKeyword("RAY_TERMINATE_ON");
+        meshRenderer.sharedMaterial.SetFloat("_MinVal", visibilityWindow.x);
+        meshRenderer.sharedMaterial.SetFloat("_MaxVal", visibilityWindow.y);
+        meshRenderer.sharedMaterial.SetVector("_TextureSize", new Vector3(dataset.dimX, dataset.dimY, dataset.dimZ));
 
-    //    if (dvrBackward)
-    //        meshRenderer.sharedMaterial.EnableKeyword("DVR_BACKWARD_ON");
-    //    else
-    //        meshRenderer.sharedMaterial.DisableKeyword("DVR_BACKWARD_ON");
+        //if (rayTerminationEnabled)
+        //    meshRenderer.sharedMaterial.EnableKeyword("RAY_TERMINATE_ON");
+        //else
+        //    meshRenderer.sharedMaterial.DisableKeyword("RAY_TERMINATE_ON");
 
-    //    if (cubicInterpolationEnabled)
-    //        meshRenderer.sharedMaterial.EnableKeyword("CUBIC_INTERPOLATION_ON");
-    //    else
-    //        meshRenderer.sharedMaterial.DisableKeyword("CUBIC_INTERPOLATION_ON");
+        //if (dvrBackward)
+        //    meshRenderer.sharedMaterial.EnableKeyword("DVR_BACKWARD_ON");
+        //else
+        //    meshRenderer.sharedMaterial.DisableKeyword("DVR_BACKWARD_ON");
 
-    //}
+        //if (cubicInterpolationEnabled)
+        //    meshRenderer.sharedMaterial.EnableKeyword("CUBIC_INTERPOLATION_ON");
+        //else
+        //    meshRenderer.sharedMaterial.DisableKeyword("CUBIC_INTERPOLATION_ON");
 
-    //private void Start()
-    //{
-    //    UpdateMaterialProperties();
-    //}
+    }
+
+    private void Start()
+    {
+        UpdateMaterialProperties();
+    }
 }

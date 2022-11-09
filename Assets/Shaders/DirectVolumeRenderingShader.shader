@@ -8,6 +8,8 @@
         _TFTex("Transfer Function Texture (Generated)", 2D) = "" {}
         _MinVal("Min val", Range(0.0, 1.0)) = 0.0
         _MaxVal("Max val", Range(0.0, 1.0)) = 1.0
+        _NumMaxStepForDVR("max step dvr", Range(0,1024)) = 512
+        _NumMaxStepForISOSurf("max step isp surface", Range(0,1024)) = 1024
     }
     SubShader
     {
@@ -71,6 +73,9 @@
             float _MinVal;
             float _MaxVal;
             float3 _TextureSize;
+
+            int _NumMaxStepForDVR;
+            int _NumMaxStepForISOSurf;
 
 #if CROSS_SECTION_ON
 #define CROSS_SECTION_TYPE_PLANE 1 
@@ -282,7 +287,7 @@
             frag_out frag_dvr(frag_in i)
             {
                 //#define MAX_NUM_STEPS 512
-                #define MAX_NUM_STEPS 64
+                //#define MAX_NUM_STEPS 64
                 #define OPACITY_THRESHOLD (1.0 - 1.0 / 255.0)
 
 #ifdef DVR_BACKWARD_ON
@@ -290,7 +295,7 @@
 #else
                 RayInfo ray = getRayFront2Back(i.vertexLocal);
 #endif
-                RaymarchInfo raymarchInfo = initRaymarch(ray, MAX_NUM_STEPS);
+                RaymarchInfo raymarchInfo = initRaymarch(ray, _NumMaxStepForDVR);
 
                 float3 lightDir = normalize(ObjSpaceViewDir(float4(float3(0.0f, 0.0f, 0.0f), 0.0f)));
 
@@ -415,10 +420,10 @@
             // Draws the first point (closest to camera) with a density within the user-defined thresholds.
             frag_out frag_surf(frag_in i)
             {
-                #define MAX_NUM_STEPS 1024
+                //#define MAX_NUM_STEPS 1024
 
                 RayInfo ray = getRayFront2Back(i.vertexLocal);
-                RaymarchInfo raymarchInfo = initRaymarch(ray, MAX_NUM_STEPS);
+                RaymarchInfo raymarchInfo = initRaymarch(ray, _NumMaxStepForISOSurf);
 
                 // Create a small random offset in order to remove artifacts
                 ray.startPos = ray.startPos + (JITTER_FACTOR * ray.direction * raymarchInfo.stepSize) * tex2D(_NoiseTex, float2(i.uv.x, i.uv.y)).r;
