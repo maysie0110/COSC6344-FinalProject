@@ -44,7 +44,7 @@ public class VolumeRenderedObject : MonoBehaviour
     public int maxStepForDVR = 512;
     public int maxStepForISOSurf = 512;
 
-    //private CrossSectionManager crossSectionManager;
+    private CrossSectionManager crossSectionManager;
 
     //public SlicingPlane CreateSlicingPlane()
     //{
@@ -104,14 +104,14 @@ public class VolumeRenderedObject : MonoBehaviour
     //    return lightSource;
     //}
 
-    //public CrossSectionManager GetCrossSectionManager()
-    //{
-    //    if (crossSectionManager == null)
-    //        crossSectionManager = GetComponent<CrossSectionManager>();
-    //    if (crossSectionManager == null)
-    //        crossSectionManager = gameObject.AddComponent<CrossSectionManager>();
-    //    return crossSectionManager;
-    //}
+    public CrossSectionManager GetCrossSectionManager()
+    {
+        if (crossSectionManager == null)
+            crossSectionManager = GetComponent<CrossSectionManager>();
+        if (crossSectionManager == null)
+            crossSectionManager = gameObject.AddComponent<CrossSectionManager>();
+        return crossSectionManager;
+    }
 
     //public void SetLightingEnabled(bool enable)
     //{
