@@ -44,25 +44,25 @@ public class VolumeRenderedObject : MonoBehaviour
     public int maxStepForDVR = 512;
     public int maxStepForISOSurf = 512;
 
-    //private CrossSectionManager crossSectionManager;
+    private CrossSectionManager crossSectionManager;
 
-    //public SlicingPlane CreateSlicingPlane()
-    //{
-    //    GameObject sliceRenderingPlane = GameObject.Instantiate(Resources.Load<GameObject>("SlicingPlane"));
-    //    sliceRenderingPlane.transform.parent = transform;
-    //    sliceRenderingPlane.transform.localPosition = Vector3.zero;
-    //    sliceRenderingPlane.transform.localRotation = Quaternion.identity;
-    //    sliceRenderingPlane.transform.localScale = Vector3.one * 0.1f; // TODO: Change the plane mesh instead and use Vector3.one
-    //    MeshRenderer sliceMeshRend = sliceRenderingPlane.GetComponent<MeshRenderer>();
-    //    sliceMeshRend.material = new Material(sliceMeshRend.sharedMaterial);
-    //    Material sliceMat = sliceRenderingPlane.GetComponent<MeshRenderer>().sharedMaterial;
-    //    sliceMat.SetTexture("_DataTex", dataset.GetDataTexture());
-    //    sliceMat.SetTexture("_TFTex", transferFunction.GetTexture());
-    //    sliceMat.SetMatrix("_parentInverseMat", transform.worldToLocalMatrix);
-    //    sliceMat.SetMatrix("_planeMat", Matrix4x4.TRS(sliceRenderingPlane.transform.position, sliceRenderingPlane.transform.rotation, transform.lossyScale)); // TODO: allow changing scale
+    public SlicingPlane CreateSlicingPlane()
+    {
+        GameObject sliceRenderingPlane = GameObject.Instantiate(Resources.Load<GameObject>("SlicingPlane"));
+        sliceRenderingPlane.transform.parent = transform;
+        sliceRenderingPlane.transform.localPosition = Vector3.zero;
+        sliceRenderingPlane.transform.localRotation = Quaternion.identity;
+        sliceRenderingPlane.transform.localScale = Vector3.one * 0.1f; // TODO: Change the plane mesh instead and use Vector3.one
+        MeshRenderer sliceMeshRend = sliceRenderingPlane.GetComponent<MeshRenderer>();
+        sliceMeshRend.material = new Material(sliceMeshRend.sharedMaterial);
+        Material sliceMat = sliceRenderingPlane.GetComponent<MeshRenderer>().sharedMaterial;
+        sliceMat.SetTexture("_DataTex", dataset.GetDataTexture());
+        sliceMat.SetTexture("_TFTex", transferFunction.GetTexture());
+        sliceMat.SetMatrix("_parentInverseMat", transform.worldToLocalMatrix);
+        sliceMat.SetMatrix("_planeMat", Matrix4x4.TRS(sliceRenderingPlane.transform.position, sliceRenderingPlane.transform.rotation, transform.lossyScale)); // TODO: allow changing scale
 
-    //    return sliceRenderingPlane.GetComponent<SlicingPlane>();
-    //}
+        return sliceRenderingPlane.GetComponent<SlicingPlane>();
+    }
 
     public void SetRenderMode(VolumeRenderMode mode)
     {
@@ -104,14 +104,14 @@ public class VolumeRenderedObject : MonoBehaviour
     //    return lightSource;
     //}
 
-    //public CrossSectionManager GetCrossSectionManager()
-    //{
-    //    if (crossSectionManager == null)
-    //        crossSectionManager = GetComponent<CrossSectionManager>();
-    //    if (crossSectionManager == null)
-    //        crossSectionManager = gameObject.AddComponent<CrossSectionManager>();
-    //    return crossSectionManager;
-    //}
+    public CrossSectionManager GetCrossSectionManager()
+    {
+        if (crossSectionManager == null)
+            crossSectionManager = GetComponent<CrossSectionManager>();
+        if (crossSectionManager == null)
+            crossSectionManager = gameObject.AddComponent<CrossSectionManager>();
+        return crossSectionManager;
+    }
 
     //public void SetLightingEnabled(bool enable)
     //{
