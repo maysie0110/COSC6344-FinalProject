@@ -8,21 +8,43 @@ public class CustomInteractable : MonoBehaviour
     private MeshRenderer meshRenderer = null;
     private XRGrabInteractable grabInteractable = null;
 
-    private void Awake()
-    {
-        meshRenderer = GetComponent<MeshRenderer>();
-        grabInteractable = GetComponent<XRGrabInteractable>();
+    public GameObject plane;
 
-        grabInteractable.onActivate.AddListener(SetEnable);
-        grabInteractable.onDeactivate.AddListener(SetDisable);
-    }
+    //private void Awake()
+    //{
+    //    meshRenderer = GetComponent<MeshRenderer>();
+    //    grabInteractable = GetComponent<XRGrabInteractable>();
 
-    private void SetEnable(XRBaseInteractor interactor)
+    //    grabInteractable.onActivate.AddListener(SetEnable);
+    //    grabInteractable.onDeactivate.AddListener(SetDisable);
+    //}
+
+    //private void SetEnable(XRBaseInteractor interactor)
+    //{
+    //    meshRenderer.enabled = true;
+    //}
+    //private void SetDisable(XRBaseInteractor interactor)
+    //{
+    //    meshRenderer.enabled = false;
+    //}
+
+    public void SetEnable()
     {
-        meshRenderer.enabled = true;
+        ////plane.SetActive(true);
+        //meshRenderer = plane.GetComponent<MeshRenderer>();
+        //meshRenderer.enabled = true;
+        Debug.Log("Enable");
+
+        plane.GetComponent<SlicingPlane>().enabled = true;
     }
-    private void SetDisable(XRBaseInteractor interactor)
+    public void SetDisable()
     {
-        meshRenderer.enabled = false;
+        ////plane.SetActive(false);
+        //meshRenderer = plane.GetComponent<MeshRenderer>();
+        //meshRenderer.sharedMaterial = false;
+        Debug.Log("Disable");
+
+        plane.GetComponent<SlicingPlane>().enabled = false;
+
     }
 }

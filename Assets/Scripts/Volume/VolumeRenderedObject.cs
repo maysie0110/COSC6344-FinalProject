@@ -89,10 +89,10 @@ public class VolumeRenderedObject : MonoBehaviour
     //    return tfRenderMode;
     //}
 
-    //public RenderMode GetRenderMode()
-    //{
-    //    return renderMode;
-    //}
+    public VolumeRenderMode GetRenderMode()
+    {
+        return renderMode;
+    }
 
     //public bool GetLightingEnabled()
     //{
@@ -160,10 +160,10 @@ public class VolumeRenderedObject : MonoBehaviour
         }
     }
 
-    //public Vector2 GetVisibilityWindow()
-    //{
-    //    return visibilityWindow;
-    //}
+    public Vector2 GetVisibilityWindow()
+    {
+        return visibilityWindow;
+    }
 
     //public bool GetRayTerminationEnabled()
     //{

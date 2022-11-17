@@ -42,4 +42,18 @@ public class CrossSectionPlane : MonoBehaviour, CrossSectionObject
     {
         return transform.worldToLocalMatrix * targetObject.transform.localToWorldMatrix;
     }
+
+    public void SetEnable()
+    {
+        Debug.Log("Enable");
+        if (targetObject != null)
+            targetObject.GetCrossSectionManager().AddCrossSectionObject(this);
+    }
+
+    public void SetDisable()
+    {
+        Debug.Log("Disable");
+        if (targetObject != null)
+            targetObject.GetCrossSectionManager().RemoveCrossSectionObject(this);
+    }
 }
