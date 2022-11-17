@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class Interaction : MonoBehaviour
 {
-    public VolumeRenderedObject volumeRenderedObject;
+    public List<GameObject> renderedObjects;
+    public GameObject renderedObject;
+
+    private VolumeRenderedObject volumeRenderedObject;
+
+
     private VolumeRenderMode renderMode;
 
     private Vector2 visibilityValue;
@@ -12,38 +17,73 @@ public class Interaction : MonoBehaviour
     private GameObject crossSectionObject;
     private GameObject meshContainer;
 
+    private static List<VolumeRenderMode> renderModes;
+
     bool active = false;
+    int i = 0;
+    int j = 0;
     void Start()
     {
+        volumeRenderedObject = renderedObject.GetComponent<VolumeRenderedObject>();
         crossSectionObject = volumeRenderedObject.transform.GetChild(1).gameObject;
         crossSectionObject.SetActive(active);
 
         meshContainer = volumeRenderedObject.transform.GetChild(0).gameObject;
+
+        renderModes = new List<VolumeRenderMode>();
+        renderModes.Add(VolumeRenderMode.DirectVolumeRendering);
+        renderModes.Add(VolumeRenderMode.MaximumIntensityProjectipon);
+        renderModes.Add(VolumeRenderMode.IsosurfaceRendering);
     }
     // Update is called once per frame
     void Update()
     {
+
         /*
-         * Changing render mode using button
+         * Changing data set using button
          */
-        //if (OVRInput.Get(OVRInput.Button.One, OVRInput.Controller.RTouch))
-        //    volumeRenderedObject.SetRenderMode(VolumeRenderMode.DirectVolumeRendering);
+        if(OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.LTouch))
+        {
+            i++;
+            if (i > 2) i = 0; //Reset index
 
-        //if (OVRInput.Get(OVRInput.Button.Two, OVRInput.Controller.RTouch))
-        //    volumeRenderedObject.SetRenderMode(VolumeRenderMode.IsosurfaceRendering);
+            if(renderedObject != renderedObjects[i])
+            {
+                renderedObject.SetActive(false);
+                renderedObjects[i].SetActive(true);
 
+                volumeRenderedObject = renderedObjects[i].GetComponent<VolumeRenderedObject>();
+                crossSectionObject = volumeRenderedObject.transform.GetChild(1).gameObject;
+                crossSectionObject.SetActive(active);
+                meshContainer = volumeRenderedObject.transform.GetChild(0).gameObject;
+
+                renderedObject = renderedObjects[i];
+            }
+        }
+        
+
+        /*
+        * Changing render mode using button
+        */
         renderMode = volumeRenderedObject.GetRenderMode();
         if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
         {
-            if(renderMode != VolumeRenderMode.DirectVolumeRendering)
-                volumeRenderedObject.SetRenderMode(VolumeRenderMode.DirectVolumeRendering);
-                
-            else if(renderMode != VolumeRenderMode.IsosurfaceRendering)
-                volumeRenderedObject.SetRenderMode(VolumeRenderMode.IsosurfaceRendering);
+            j++;
+            if (j > 2) j = 0; //Reset index
+
+            if(renderMode != renderModes[j])
+                volumeRenderedObject.SetRenderMode(renderModes[j]);
+
+            //if (renderMode != VolumeRenderMode.DirectVolumeRendering)
+            //    volumeRenderedObject.SetRenderMode(VolumeRenderMode.DirectVolumeRendering);
+
+            //else if (renderMode != VolumeRenderMode.IsosurfaceRendering)
+            //    volumeRenderedObject.SetRenderMode(VolumeRenderMode.IsosurfaceRendering);
+
+            //    if (renderMode != VolumeRenderMode.MaximumIntensityProjectipon)
+            //        volumeRenderedObject.SetRenderMode(VolumeRenderMode.MaximumIntensityProjectipon);
+
         }
-
-
-
 
 
         /*

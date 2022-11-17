@@ -1,6 +1,13 @@
 using Facebook.WitAi.Lib;
 using UnityEngine;
 
+public enum LightSource
+{
+    ActiveCamera,
+    SceneMainLight
+}
+
+
 public enum VolumeRenderMode
 {
     DirectVolumeRendering,
@@ -27,10 +34,10 @@ public class VolumeRenderedObject : MonoBehaviour
     private VolumeRenderMode renderMode;
     //    [SerializeField, HideInInspector]
     //    private TFRenderMode tfRenderMode;
-    //    [SerializeField, HideInInspector]
-    //   private bool lightingEnabled;
-    //    [SerializeField, HideInInspector]
-    //    private LightSource lightSource;
+    [SerializeField, HideInInspector]
+    private bool lightingEnabled;
+    [SerializeField, HideInInspector]
+    private LightSource lightSource;
 
     [SerializeField, HideInInspector]
     private Vector2 visibilityWindow = new Vector2(0.0f, 1.0f);
@@ -42,7 +49,7 @@ public class VolumeRenderedObject : MonoBehaviour
     private bool cubicInterpolationEnabled = false;
 
     public int maxStepForDVR = 512;
-    public int maxStepForISOSurf = 512;
+    public int maxStepForISOSurf = 1024;
 
     private CrossSectionManager crossSectionManager;
 
@@ -94,15 +101,15 @@ public class VolumeRenderedObject : MonoBehaviour
         return renderMode;
     }
 
-    //public bool GetLightingEnabled()
-    //{
-    //    return lightingEnabled;
-    //}
+    public bool GetLightingEnabled()
+    {
+        return lightingEnabled;
+    }
 
-    //public LightSource GetLightSource()
-    //{
-    //    return lightSource;
-    //}
+    public LightSource GetLightSource()
+    {
+        return lightSource;
+    }
 
     public CrossSectionManager GetCrossSectionManager()
     {
@@ -113,20 +120,20 @@ public class VolumeRenderedObject : MonoBehaviour
         return crossSectionManager;
     }
 
-    //public void SetLightingEnabled(bool enable)
-    //{
-    //    if (enable != lightingEnabled)
-    //    {
-    //        lightingEnabled = enable;
-    //        UpdateMaterialProperties();
-    //    }
-    //}
+    public void SetLightingEnabled(bool enable)
+    {
+        if (enable != lightingEnabled)
+        {
+            lightingEnabled = enable;
+            UpdateMaterialProperties();
+        }
+    }
 
-    //public void SetLightSource(LightSource source)
-    //{
-    //    lightSource = source;
-    //    UpdateMaterialProperties();
-    //}
+    public void SetLightSource(LightSource source)
+    {
+        lightSource = source;
+        UpdateMaterialProperties();
+    }
 
     public void SetVisibilityWindow(float min, float max)
     {
@@ -215,7 +222,8 @@ public class VolumeRenderedObject : MonoBehaviour
 
     private void UpdateMaterialProperties()
     {
-        bool useGradientTexture =/* tfRenderMode == TFRenderMode.TF2D || */renderMode == VolumeRenderMode.IsosurfaceRendering/* || lightingEnabled*/;
+        //bool useGradientTexture =/* tfRenderMode == TFRenderMode.TF2D || */renderMode == VolumeRenderMode.IsosurfaceRendering /*|| lightingEnabled*/;
+        bool useGradientTexture = true;
         meshRenderer.sharedMaterial.SetTexture("_GradientTex", useGradientTexture ? dataset.GetGradientTexture() : null);
 
         //if (tfRenderMode == TFRenderMode.TF2D)
@@ -230,12 +238,12 @@ public class VolumeRenderedObject : MonoBehaviour
         //}
 
         //if (lightingEnabled)
-        //    meshRenderer.sharedMaterial.EnableKeyword("LIGHTING_ON");
+            meshRenderer.sharedMaterial.EnableKeyword("LIGHTING_ON");
         //else
         //    meshRenderer.sharedMaterial.DisableKeyword("LIGHTING_ON");
 
         //if (lightSource == LightSource.SceneMainLight)
-        //    meshRenderer.sharedMaterial.EnableKeyword("USE_MAIN_LIGHT");
+            meshRenderer.sharedMaterial.EnableKeyword("USE_MAIN_LIGHT");
         //else
         //    meshRenderer.sharedMaterial.DisableKeyword("USE_MAIN_LIGHT");
 
