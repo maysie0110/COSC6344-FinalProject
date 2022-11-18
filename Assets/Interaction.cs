@@ -33,6 +33,7 @@ public class Interaction : MonoBehaviour
         renderModes = new List<VolumeRenderMode>();
         renderModes.Add(VolumeRenderMode.DirectVolumeRendering);
         renderModes.Add(VolumeRenderMode.MaximumIntensityProjectipon);
+        renderModes.Add(VolumeRenderMode.LocalMaximumIntensityProjectipon);
         renderModes.Add(VolumeRenderMode.IsosurfaceRendering);
     }
     // Update is called once per frame
@@ -69,7 +70,9 @@ public class Interaction : MonoBehaviour
         if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
         {
             j++;
-            if (j > 2) j = 0; //Reset index
+            j %= renderModes.Count;
+
+            //if (j > 2) j = 0; //Reset index
 
             if(renderMode != renderModes[j])
                 volumeRenderedObject.SetRenderMode(renderModes[j]);
@@ -87,30 +90,47 @@ public class Interaction : MonoBehaviour
 
 
         /*
-        * Change visibility using right thumbstick 
+        * Change visibility or max density using right thumbstick 
         */
-        visibilityValue = volumeRenderedObject.GetVisibilityWindow();
-        //if (OVRInput.GetDown(OVRInput.Touch.PrimaryThumbstick, OVRInput.Controller.RTouch))
-        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
+        if(renderMode == VolumeRenderMode.LocalMaximumIntensityProjectipon)
         {
-            Debug.Log("Pressed Thumbstick");
+            if (OVRInput.Get(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
+            {
+                Debug.Log("Pressed Thumbstick");
 
-            //// returns a Vector2 of the primary thumbstick’s current state.
-            //// (X/Y range of -1.0f to 1.0f)
-            visibilityValue = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
-            volumeRenderedObject.SetVisibilityWindowMin(visibilityValue.x);
-            //Debug.Log(visibilityValue);
+                //// returns a Vector2 of the primary thumbstick’s current state.
+                //// (X/Y range of -1.0f to 1.0f)
+                Vector2 maxDensity = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+                volumeRenderedObject.SetMaxDensity(maxDensity.x);
+                //Debug.Log(visibilityValue);
+            }
         }
-        //else if (!OVRInput.Get(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
-        //{
-        //    Debug.Log("Released Thumbstick");
-        //}
+        else
+        {
+            visibilityValue = volumeRenderedObject.GetVisibilityWindow();
+            //if (OVRInput.GetDown(OVRInput.Touch.PrimaryThumbstick, OVRInput.Controller.RTouch))
+            if (OVRInput.Get(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
+            {
+                Debug.Log("Pressed Thumbstick");
+
+                //// returns a Vector2 of the primary thumbstick’s current state.
+                //// (X/Y range of -1.0f to 1.0f)
+                visibilityValue = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+                volumeRenderedObject.SetVisibilityWindowMin(visibilityValue.x);
+                //Debug.Log(visibilityValue);
+            }
+            //else if (!OVRInput.Get(OVRInput.Button.PrimaryThumbstick, OVRInput.Controller.RTouch))
+            //{
+            //    Debug.Log("Released Thumbstick");
+            //}
+        }
+
 
 
         /*
          * Enable/Disable Cut plane
          */
-        
+
         if (OVRInput.GetDown(OVRInput.Button.Two, OVRInput.Controller.RTouch))
         {
             //volumeRenderedObject.GetCrossSectionManager().AddCrossSectionObject(crossSectionObject);

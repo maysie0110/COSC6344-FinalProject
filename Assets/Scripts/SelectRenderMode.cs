@@ -11,7 +11,7 @@ public class SelectRenderMode : MonoBehaviour
     {
         TMP_Dropdown tMP_Dropdown = GetComponent<TMP_Dropdown>();
 
-        Debug.Log(tMP_Dropdown.value);
+        //Debug.Log(tMP_Dropdown.value);
         if (tMP_Dropdown.value == 0)
         {
             volumeRenderedObject.SetRenderMode(VolumeRenderMode.DirectVolumeRendering);
