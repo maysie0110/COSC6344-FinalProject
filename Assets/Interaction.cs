@@ -50,6 +50,7 @@ public class Interaction : MonoBehaviour
         renderModes.Add(VolumeRenderMode.IsosurfaceRendering);
 
         dataNameDisplay.text = GetStringBetweenCharacters(renderedObject.name, '_', '.');
+        renderMode = VolumeRenderMode.DirectVolumeRendering;
         renderModeDisplay.text = "Direct Volume Rendering";
     }
     // Update is called once per frame
@@ -71,6 +72,7 @@ public class Interaction : MonoBehaviour
                 renderedObject = renderedObjects[i];
 
                 volumeRenderedObject = renderedObject.GetComponent<VolumeRenderedObject>();
+                volumeRenderedObject.SetRenderMode(renderMode);
                 //crossSectionObject = volumeRenderedObject.transform.GetChild(1).gameObject;
                 crossSectionObject.GetComponent<CrossSectionPlane>().SetTargetObject(volumeRenderedObject);
                 crossSectionObject.SetActive(active);
