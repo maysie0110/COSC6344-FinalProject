@@ -20,5 +20,13 @@ public class SelectRenderMode : MonoBehaviour
         {
             volumeRenderedObject.SetRenderMode(VolumeRenderMode.IsosurfaceRendering);
         }
+        else if (tMP_Dropdown.value == 2)
+        {
+            volumeRenderedObject.SetRenderMode(VolumeRenderMode.LocalMaximumIntensityProjectipon);
+        }
+        else if (tMP_Dropdown.value == 3)
+        {
+            volumeRenderedObject.SetRenderMode(VolumeRenderMode.MaximumIntensityProjectipon);
+        }
     }
 }
