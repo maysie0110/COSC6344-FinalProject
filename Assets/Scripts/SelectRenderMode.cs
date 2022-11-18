@@ -11,7 +11,7 @@ public class SelectRenderMode : MonoBehaviour
     {
         TMP_Dropdown tMP_Dropdown = GetComponent<TMP_Dropdown>();
 
-        Debug.Log(tMP_Dropdown.value);
+        //Debug.Log(tMP_Dropdown.value);
         if (tMP_Dropdown.value == 0)
         {
             volumeRenderedObject.SetRenderMode(VolumeRenderMode.DirectVolumeRendering);
@@ -19,6 +19,14 @@ public class SelectRenderMode : MonoBehaviour
         else if (tMP_Dropdown.value == 1)
         {
             volumeRenderedObject.SetRenderMode(VolumeRenderMode.IsosurfaceRendering);
+        }
+        else if (tMP_Dropdown.value == 2)
+        {
+            volumeRenderedObject.SetRenderMode(VolumeRenderMode.LocalMaximumIntensityProjectipon);
+        }
+        else if (tMP_Dropdown.value == 3)
+        {
+            volumeRenderedObject.SetRenderMode(VolumeRenderMode.MaximumIntensityProjectipon);
         }
     }
 }

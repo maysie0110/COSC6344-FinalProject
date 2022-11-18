@@ -12,6 +12,7 @@ public enum VolumeRenderMode
 {
     DirectVolumeRendering,
     MaximumIntensityProjectipon,
+    LocalMaximumIntensityProjectipon,
     IsosurfaceRendering
 }
 
@@ -50,7 +51,7 @@ public class VolumeRenderedObject : MonoBehaviour
 
     public int maxStepForDVR = 512;
     public int maxStepForISOSurf = 1024;
-
+    public float maxDensityThreshold = 0.5f;
     private CrossSectionManager crossSectionManager;
 
     public SlicingPlane CreateSlicingPlane()
@@ -135,6 +136,14 @@ public class VolumeRenderedObject : MonoBehaviour
         UpdateMaterialProperties();
     }
 
+    public void SetMaxDensity(float max)
+    {
+        if(maxDensityThreshold != max)
+        {
+            maxDensityThreshold = max;
+            UpdateMaterialProperties();
+        }
+    }
     public void SetVisibilityWindow(float min, float max)
     {
         SetVisibilityWindow(new Vector2(min, max));
@@ -254,6 +263,7 @@ public class VolumeRenderedObject : MonoBehaviour
                     meshRenderer.sharedMaterial.EnableKeyword("MODE_DVR");
                     meshRenderer.sharedMaterial.DisableKeyword("MODE_MIP");
                     meshRenderer.sharedMaterial.DisableKeyword("MODE_SURF");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_LMIP");
                     break;
                 }
             case VolumeRenderMode.MaximumIntensityProjectipon:
@@ -261,6 +271,15 @@ public class VolumeRenderedObject : MonoBehaviour
                     meshRenderer.sharedMaterial.DisableKeyword("MODE_DVR");
                     meshRenderer.sharedMaterial.EnableKeyword("MODE_MIP");
                     meshRenderer.sharedMaterial.DisableKeyword("MODE_SURF");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_LMIP");
+                    break;
+                }
+            case VolumeRenderMode.LocalMaximumIntensityProjectipon:
+                {
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_DVR");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_MIP");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_SURF");
+                    meshRenderer.sharedMaterial.EnableKeyword("MODE_LMIP");
                     break;
                 }
             case VolumeRenderMode.IsosurfaceRendering:
@@ -268,15 +287,19 @@ public class VolumeRenderedObject : MonoBehaviour
                     meshRenderer.sharedMaterial.DisableKeyword("MODE_DVR");
                     meshRenderer.sharedMaterial.DisableKeyword("MODE_MIP");
                     meshRenderer.sharedMaterial.EnableKeyword("MODE_SURF");
+                    meshRenderer.sharedMaterial.DisableKeyword("MODE_LMIP");
                     break;
                 }
         }
 
         meshRenderer.sharedMaterial.SetInt("_NumMaxStepForDVR", maxStepForDVR);
+        meshRenderer.sharedMaterial.SetInt("_NumMaxStep", maxStepForDVR);
         meshRenderer.sharedMaterial.SetInt("_NumMaxStepForISOSurf", maxStepForISOSurf);
 
         meshRenderer.sharedMaterial.SetFloat("_MinVal", visibilityWindow.x);
         meshRenderer.sharedMaterial.SetFloat("_MaxVal", visibilityWindow.y);
+        meshRenderer.sharedMaterial.SetFloat("_thresholdMaxDensity", maxDensityThreshold);
+
         meshRenderer.sharedMaterial.SetVector("_TextureSize", new Vector3(dataset.dimX, dataset.dimY, dataset.dimZ));
 
         //if (rayTerminationEnabled)

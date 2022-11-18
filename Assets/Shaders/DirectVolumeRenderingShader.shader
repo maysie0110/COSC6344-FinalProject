@@ -8,6 +8,7 @@
         _TFTex("Transfer Function Texture (Generated)", 2D) = "" {}
         _MinVal("Min val", Range(0.0, 1.0)) = 0.0
         _MaxVal("Max val", Range(0.0, 1.0)) = 1.0
+        _thresholdMaxDensity("Threshold val", Range(0.0, 1.0)) = 1.0
         _NumMaxStepForDVR("max step dvr", Range(0,1024)) = 512
         _NumMaxStepForISOSurf("max step isp surface", Range(0,1024)) = 1024
     }
@@ -23,7 +24,7 @@
         Pass
         {
             CGPROGRAM
-            #pragma multi_compile MODE_DVR MODE_MIP MODE_SURF
+            #pragma multi_compile MODE_DVR MODE_MIP MODE_LMIP MODE_SURF
             #pragma multi_compile __ TF2D_ON
             #pragma multi_compile __ CROSS_SECTION_ON
             #pragma multi_compile __ LIGHTING_ON
@@ -72,6 +73,7 @@
 
             float _MinVal;
             float _MaxVal;
+            float _thresholdMaxDensity;
             float3 _TextureSize;
 
             int _NumMaxStepForDVR;
@@ -380,6 +382,46 @@
             }
 
             // Maximum Intensity Projection mode
+            frag_out frag_lmip(frag_in i)
+            {
+#define MAX_NUM_STEPS 512
+
+                RayInfo ray = getRayBack2Front(i.vertexLocal);
+                RaymarchInfo raymarchInfo = initRaymarch(ray, MAX_NUM_STEPS);
+
+                float maxDensity = 0.0f;
+                float3 maxDensityPos = ray.startPos;
+                for (int iStep = 0; iStep < raymarchInfo.numSteps; iStep++)
+                {
+                    const float t = iStep * raymarchInfo.numStepsRecip;
+                    const float3 currPos = lerp(ray.startPos, ray.endPos, t);
+
+#ifdef CROSS_SECTION_ON
+                    if (IsCutout(currPos))
+                        continue;
+#endif
+
+                    const float density = getDensity(currPos);
+                    if (density >= _thresholdMaxDensity)
+                        continue;
+
+                    if (density > maxDensity && density > _MinVal && density < _MaxVal)
+                    {
+                        maxDensity = density;
+                        maxDensityPos = currPos;
+                    }
+                }
+
+                // Write fragment output
+                frag_out output;
+                output.colour = float4(1.0f, 1.0f, 1.0f, maxDensity); // maximum intensity
+#if DEPTHWRITE_ON
+                output.depth = localToDepth(maxDensityPos - float3(0.5f, 0.5f, 0.5f));
+#endif
+                return output;
+            }
+
+            // Maximum Intensity Projection mode
             frag_out frag_mip(frag_in i)
             {
                 #define MAX_NUM_STEPS 512
@@ -472,6 +514,8 @@
                 return frag_dvr(i);
 #elif MODE_MIP
                 return frag_mip(i);
+#elif MODE_LMIP
+                return frag_lmip(i);
 #elif MODE_SURF
                 return frag_surf(i);
 #endif
